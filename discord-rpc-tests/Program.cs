@@ -52,16 +52,14 @@ namespace discord_rpc_tests
 
         static void Update()
         {
-            Random rng = new Random();
-            RichPresence BB = new RichPresence { };
-
-            BB.Details = "IRL";
-            BB.State = String.Format("Sleeping 💤💤💤");
-            BB.largeImageKey = "sleep";
-            BB.largeImageText = "😴";
-            BB.startTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
-            BB.endTimestamp = DateTimeOffset.Now.AddHours(8).ToUnixTimeSeconds();
-            Discord.UpdatePresence(BB);
+            RichPresence RP = new RichPresence { };
+            RP.Details = "IRL";
+            RP.State = String.Format("Sleeping 💤💤💤");
+            RP.largeImageKey = "sleep";
+            RP.largeImageText = "😴";
+            RP.startTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            RP.endTimestamp = DateTimeOffset.Now.AddHours(8).ToUnixTimeSeconds();
+            Discord.UpdatePresence(RP);
 
 
         }
