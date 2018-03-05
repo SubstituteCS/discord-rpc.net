@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using discord_rpc;
 
@@ -7,66 +7,62 @@ namespace discord_rpc_tests
     class Program
     {
         static bool ready = false;
+        static RichPresence RP = new RichPresence { Details = "Discord-RPC.net" };
+
         static void Main(string[] args)
         {
-            Task.Run(Run);
-            Console.WriteLine("Presence Started");
-            while (true)
-            {
-                Console.Read();
-            }
-
+            Task.Run(Callbacks);
+            Run().GetAwaiter().GetResult();
         }
+
         static async Task Run()
         {
-            DiscordEventHandlers handlers = new DiscordEventHandlers();
-            handlers.ready += Ready;
-            handlers.disconnected += DC;
-            while (true)
+            Console.WriteLine("Presence Started");
+            string str = String.Empty;
+            do
             {
-                Discord.RunCallbacks();
                 if (ready)
                 {
-                    
+                    Console.WriteLine("Enter Next State:");
+                    str = Console.ReadLine();
+                    RP.State = str;
+                    await Discord.UpdatePresenceAsync(RP);
                 }
                 else
                 {
-                    await Discord.InitializeAsync("419236472705515520", handlers, 1, "");
+                    Console.Write(".");
+                    DiscordEventHandlers handlers = new DiscordEventHandlers { };
+                    handlers.ready = Ready;
+                    handlers.disconnected = Disconnected;
+                    await Discord.InitializeAsync("418842770057461762", handlers, 1, "");
                 }
-                System.Threading.Thread.Sleep(15000);
+                await Task.Delay(100);
+            } while (str.ToLower() != "c");
+            await Discord.ShutdownAsync();
+        }
 
+        static async Task Callbacks()
+        {
+            while (true)
+            {
+                Discord.RunCallbacks();
+                await Task.Delay(100);
             }
         }
 
-        static void DC(int errorCode, string message)
+        static void Disconnected(int errorCode, string message)
         {
+            ready = false;
             Console.WriteLine("...DISCONNECTED... {0}", message);
         }
         static void Ready()
         {
             Console.WriteLine("READY");
             ready = true;
-            Update();
-        }
-
-
-        static void Update()
-        {
-            RichPresence RP = new RichPresence { };
-            RP.Details = "IRL";
-            RP.State = String.Format("Sleeping 💤💤💤");
-            RP.largeImageKey = "sleep";
-            RP.largeImageText = "😴";
+            RP.Details = "Discord-RPC.net";
+            RP.State = "👉😎👉 Zoop!";
             RP.startTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
-            RP.endTimestamp = DateTimeOffset.Now.AddHours(8).ToUnixTimeSeconds();
             Discord.UpdatePresence(RP);
-
-
         }
-
-
-
     }
-
-
 }
